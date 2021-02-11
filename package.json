@@ -1,0 +1,16 @@
+{
+  "name": "eth-booksharing",
+  "version": "1.0.0",
+  "description": "eth-booksharing",
+  "scripts": {
+    "compile": "truffle compile",
+    "migrate-dev": "truffle migrate -network development",
+    "migrate-bloxberg": "truffle migrate -network bloxberg"
+  },
+  "author": "",
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^1.2.0",
+    "solc": "^0.8.0",
+    "truffle": "^5.1.58"
+  }
+}
