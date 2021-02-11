@@ -11,9 +11,11 @@ contract BookDatabase {
         string isbn;
         uint price;
     }
+
     bytes32[] keyCollection;
 
     mapping(bytes32 => Exemplar) private keyToExemplars;
+
 
     // Setters
 
@@ -31,14 +33,14 @@ contract BookDatabase {
 
     // Update
 
-    function updateRequester(bytes32 _key, address _requester) payable external {
+    function updateRequester(bytes32 _key, address _requester, uint price) payable external {
         keyToExemplars[_key].requester = _requester;
     }
 
     function updateCurrentHolder(bytes32 _key, address _currentHolder) external {
-        if(keyToExemplars[_key].currentHolder != address(0x00)) {
-            payable(address(keyToExemplars[_key].currentHolder)).transfer(0.01 ether);
-        }
+        uint refund = (keyToExemplars[_key].price * 10) / 9;
+        payable(address(keyToExemplars[_key].currentHolder)).transfer(refund);
+        keyToExemplars[_key].price = refund;
         keyToExemplars[_key].currentHolder = _currentHolder;
     }
 
