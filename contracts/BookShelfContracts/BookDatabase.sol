@@ -15,8 +15,6 @@ contract BookDatabase {
 
     mapping(bytes32 => Exemplar) private keyToExemplars;
 
-    mapping (address => uint) depositedFunds;
-
     // Setters
 
     function addExemplar(string calldata _isbn, bytes32 _key, address _owner, address _currentHolder, address _requester) external {
@@ -34,7 +32,6 @@ contract BookDatabase {
     // Update
 
     function updateRequester(bytes32 _key, address _requester) payable external {
-        depositedFunds[_requester] += 0.01 ether;
         keyToExemplars[_key].requester = _requester;
     }
 
