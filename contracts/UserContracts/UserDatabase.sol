@@ -3,5 +3,24 @@ pragma solidity 0.8.0;
 
 contract UserDatabase {
 
+    mapping(address => string) private addressToName;
+    mapping(string => address) private nameToAddress;
 
+    function addUser(address _userAddress, string calldata _username) external {
+        nameToAddress[_username] = _userAddress;
+        addressToName[_userAddress] = _username;
+    }
+
+    function removeUser(address _userAddress) external {
+        delete nameToAddress[addressToName[_userAddress]];
+        delete addressToName[_userAddress];
+    }
+
+    function getUserName(address _address) external view returns (string memory) {
+        return addressToName[_address];
+    }
+
+    function getUserAddress(string calldata _username) external view returns (address) {
+        return nameToAddress[_username];
+    }
 }
