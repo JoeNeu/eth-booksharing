@@ -33,7 +33,21 @@ contract BookDatabase {
 
     // Update
 
+    function updateRequester(bytes32 _key, address _requester) payable external {
+        depositedFunds[_requester] += 0.01 ether;
+        keyToExemplars[_key].requester = _requester;
+    }
 
+    function updateCurrentHolder(bytes32 _key, address _currentHolder) external {
+        if(keyToExemplars[_key].currentHolder != address(0x00)) {
+            payable(address(keyToExemplars[_key].currentHolder)).transfer(0.01 ether);
+        }
+        keyToExemplars[_key].currentHolder = _currentHolder;
+    }
+
+    function updateIsUnlocked(bytes32 _key, bool _isUnlocked) external {
+        keyToExemplars[_key].isUnlocked = _isUnlocked;
+    }
 
     // Getters
 
