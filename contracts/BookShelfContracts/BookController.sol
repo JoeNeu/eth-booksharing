@@ -2,9 +2,9 @@
 pragma solidity 0.8.0;
 
 import "./Interfaces/BookDatabaseInterface.sol";
+import "../BaseContracts/Mortal.sol";
 
-
-contract BookController  {
+contract BookController is Mortal {
     BookDatabaseInterface private bookDb;
 
     constructor(address _bookDb, address _bookEvents) {

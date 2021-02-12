@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.0;
+import "../BaseContracts/Accessible.sol";
 
-contract BookDatabase {
+contract BookDatabase is Accessible {
 
     struct Exemplar {
         address owner;

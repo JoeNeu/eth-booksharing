@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.0;
+import "../BaseContracts/Accessible.sol";
 
-contract UserDatabase {
+contract UserDatabase is Accessible {
 
     mapping(address => string) private addressToName;
     mapping(string => address) private nameToAddress;

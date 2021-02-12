@@ -2,8 +2,9 @@
 pragma solidity 0.8.0;
 
 import "./Interfaces/UserDatabaseInterface.sol";
+import "../BaseContracts/Mortal.sol";
 
-contract UserController {
+contract UserController is Mortal {
 
     UserDatabaseInterface private userDb;
 

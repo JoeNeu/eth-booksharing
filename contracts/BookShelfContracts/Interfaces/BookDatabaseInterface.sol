@@ -14,8 +14,8 @@ interface BookDatabaseInterface {
 
     function addExemplar(string calldata _isbn, bytes32 _key, address _owner, address _currentHolder, address _requester) external;
 
+    function updateRequester(bytes32 _key, address _requester, uint price) payable external;
     function updateCurrentHolder(bytes32 _key, address _currentHolder) external;
-    function updateRequester(bytes32 _key, address _requester) payable external;
     function updateIsUnlocked(bytes32 _key, bool _isFree) external;
 
     function getExemplar(bytes32 _key) external view returns(address owner, address holder,address requester ,bool state, string memory isbn, uint price);
