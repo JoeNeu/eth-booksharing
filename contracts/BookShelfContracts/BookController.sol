@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.0;
 
-import "./Interfaces/BookDatabaseInterface.sol";
+
 import "../BaseContracts/Mortal.sol";
+import "./Interfaces/BookDatabaseInterface.sol";
+
 
 contract BookController is Mortal {
     BookDatabaseInterface private bookDb;
@@ -13,61 +15,60 @@ contract BookController is Mortal {
 
     // Delegate Calls
 
-    function keyExists(bytes32 _key) internal view returns (bool){
-        address owner;
-        (owner,,,,,)=bookDb.getExemplar(_key);
-        return owner != address(0x00);
+    function keyExists(bytes32 _key) internal view returns (bool) {
+        BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
+        return exemplar.owner != address(0x00);
     }
 
-    function addBook(string calldata _isbn) external returns(bool){
+    function addBook(string calldata _isbn) external {
         bytes32 newKey = keccak256(abi.encode(_isbn, msg.sender, block.timestamp));
         require(!keyExists(newKey), "Hash already exists");
 
-        bookDb.addExemplar(_isbn, newKey, msg.sender, msg.sender, address(0x00));
-        return true;
+        BookDatabaseInterface.Exemplar memory exemplar = BookDatabaseInterface.Exemplar(
+        {
+            owner: msg.sender,
+            currentHolder: msg.sender,
+            requester : address(0x00),
+            isUnlocked: true,
+            isbn: _isbn,
+            price: 0.01 ether
+        });
+        bookDb.addExemplar(newKey, exemplar);
     }
 
-    function getExemplar(bytes32 _key) external view returns(address, address, address, bool, string memory, uint) {
+    function getExemplar(bytes32 _key) external view returns(BookDatabaseInterface.Exemplar memory) {
         return bookDb.getExemplar(_key);
     }
 
     // Update delegate Calls to Database Contract
 
     function request(bytes32 _key) payable external returns(bool) {
-        address holder;
-        bool state;
-        uint price;
-        (,holder,,state,,price) = bookDb.getExemplar(_key);
-        require(msg.value == price, "price is not equal");
-        require(state);
+        BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
+        require(msg.value == exemplar.price, "price is not equal");
+        require(exemplar.state);
         bookDb.updateIsUnlocked(_key, false);
-        bookDb.updateRequester{gas: 100000, value: price }(_key,msg.sender, price);
+        bookDb.updateRequester{gas: 100000, value: exemplar.price }(_key,msg.sender, exemplar.price);
         return true;
     }
 
     function approveRequest(bytes32 _key) external returns(bool) {
-        address requester;
-        address holder;
-        (,holder,requester,,,) = bookDb.getExemplar(_key);
-        require(holder == msg.sender);
-        bookDb.updateCurrentHolder(_key, requester);
+        BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
+        require(exemplar.holder == msg.sender);
+        bookDb.updateCurrentHolder(_key, exemplar.requester);
         return true;
     }
 
     function lockExemplar(bytes32 _key) external returns(bool) {
-        address holder;
-        (,holder,,,,) = bookDb.getExemplar(_key);
-        require(holder == msg.sender);
-        bookDb.updateIsUnlocked(_key,false);
+        BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
+        require(exemplar.holder == msg.sender);
+        bookDb.updateIsUnlocked(_key, false);
         return true;
     }
 
     function unlockExemplar(bytes32 _key) external returns(bool) {
-        address holder;
-        address requester;
-        (,holder,requester,,,) = bookDb.getExemplar(_key);
-        require(holder== msg.sender && requester == address(0x00));
-        bookDb.updateIsUnlocked(_key,true);
+        BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
+        require(exemplar.holder== msg.sender && exemplar.requester == address(0x00));
+        bookDb.updateIsUnlocked(_key, true);
         return true;
     }
 }

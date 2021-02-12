@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity 0.8.0;
 
-interface BookDatabaseInterface {
+abstract contract BookDatabaseInterface {
 
-    struct Exemplar{
-        address Owner;
+    struct Exemplar {
+        address owner;
         address currentHolder;
         address requester;
         bool isUnlocked;
@@ -12,11 +12,11 @@ interface BookDatabaseInterface {
         uint price;
       }
 
-    function addExemplar(string calldata _isbn, bytes32 _key, address _owner, address _currentHolder, address _requester) external;
+    function addExemplar(bytes32 _key, Exemplar calldata exemplar) virtual external;
 
-    function updateRequester(bytes32 _key, address _requester, uint price) payable external;
-    function updateCurrentHolder(bytes32 _key, address _currentHolder) external;
-    function updateIsUnlocked(bytes32 _key, bool _isFree) external;
+    function updateRequester(bytes32 _key, address _requester, uint price) virtual payable external;
+    function updateCurrentHolder(bytes32 _key, address _currentHolder) virtual external;
+    function updateIsUnlocked(bytes32 _key, bool _isFree) virtual external;
 
-    function getExemplar(bytes32 _key) external view returns(address owner, address holder,address requester ,bool state, string memory isbn, uint price);
+    function getExemplar(bytes32 _key) virtual external view returns(Exemplar memory);
 }
