@@ -9,11 +9,11 @@ import "./Interfaces/BookDatabaseInterface.sol";
 contract BookController is Mortal {
     BookDatabaseInterface private bookDb;
 
-    constructor(address _bookDb, address _bookEvents) {
+    constructor(address _bookDb) {
         bookDb = BookDatabaseInterface(_bookDb);
     }
 
-    // Delegate Calls
+    // Delegate calls
 
     function keyExists(bytes32 _key) internal view returns (bool) {
         BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
@@ -40,35 +40,35 @@ contract BookController is Mortal {
         return bookDb.getExemplar(_key);
     }
 
-    // Update delegate Calls to Database Contract
+    // Update delegate calls to Database Contract
 
-    function request(bytes32 _key) payable external returns(bool) {
+    function request(bytes32 _key) payable external {
         BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
         require(msg.value == exemplar.price, "price is not equal");
-        require(exemplar.state);
+        require(exemplar.isUnlocked);
+
         bookDb.updateIsUnlocked(_key, false);
-        bookDb.updateRequester{gas: 100000, value: exemplar.price }(_key,msg.sender, exemplar.price);
-        return true;
+        bookDb.updateRequester{gas: 100000, value: exemplar.price}(_key, msg.sender);
     }
 
-    function approveRequest(bytes32 _key) external returns(bool) {
+    function approveRequest(bytes32 _key) external {
         BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
-        require(exemplar.holder == msg.sender);
+        require(exemplar.currentHolder == msg.sender);
+
         bookDb.updateCurrentHolder(_key, exemplar.requester);
-        return true;
     }
 
-    function lockExemplar(bytes32 _key) external returns(bool) {
+    function lockExemplar(bytes32 _key) external {
         BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
-        require(exemplar.holder == msg.sender);
+        require(exemplar.currentHolder == msg.sender);
+
         bookDb.updateIsUnlocked(_key, false);
-        return true;
     }
 
-    function unlockExemplar(bytes32 _key) external returns(bool) {
+    function unlockExemplar(bytes32 _key) external {
         BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
-        require(exemplar.holder== msg.sender && exemplar.requester == address(0x00));
+        require(exemplar.currentHolder == msg.sender && exemplar.requester == address(0x00));
+
         bookDb.updateIsUnlocked(_key, true);
-        return true;
     }
 }

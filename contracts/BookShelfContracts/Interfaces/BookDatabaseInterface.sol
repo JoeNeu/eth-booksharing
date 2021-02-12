@@ -14,7 +14,7 @@ abstract contract BookDatabaseInterface {
 
     function addExemplar(bytes32 _key, Exemplar calldata exemplar) virtual external;
 
-    function updateRequester(bytes32 _key, address _requester, uint price) virtual payable external;
+    function updateRequester(bytes32 _key, address _requester) virtual payable external;
     function updateCurrentHolder(bytes32 _key, address _currentHolder) virtual external;
     function updateIsUnlocked(bytes32 _key, bool _isFree) virtual external;
 

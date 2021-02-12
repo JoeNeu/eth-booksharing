@@ -19,7 +19,7 @@ contract BookDatabase is Accessible, BookDatabaseInterface {
 
     // Update
 
-    function updateRequester(bytes32 _key, address _requester, uint price) override payable external onlyAccessor() {
+    function updateRequester(bytes32 _key, address _requester) override payable external onlyAccessor() {
         keyToExemplars[_key].requester = _requester;
     }
 
