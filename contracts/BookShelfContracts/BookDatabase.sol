@@ -20,7 +20,7 @@ contract BookDatabase is Accessible {
 
     // Setters
 
-    function addExemplar(string calldata _isbn, bytes32 _key, address _owner, address _currentHolder, address _requester) external {
+    function addExemplar(string calldata _isbn, bytes32 _key, address _owner, address _currentHolder, address _requester) onlyAccessor() external {
         keyCollection.push(_key);
         keyToExemplars[_key] = Exemplar({
         owner:_owner,
@@ -34,18 +34,18 @@ contract BookDatabase is Accessible {
 
     // Update
 
-    function updateRequester(bytes32 _key, address _requester, uint price) payable external {
+    function updateRequester(bytes32 _key, address _requester, uint price) payable onlyAccessor() external {
         keyToExemplars[_key].requester = _requester;
     }
 
-    function updateCurrentHolder(bytes32 _key, address _currentHolder) external {
+    function updateCurrentHolder(bytes32 _key, address _currentHolder) onlyAccessor() external {
         uint refund = (keyToExemplars[_key].price * 10) / 9;
         payable(address(keyToExemplars[_key].currentHolder)).transfer(refund);
         keyToExemplars[_key].price = refund;
         keyToExemplars[_key].currentHolder = _currentHolder;
     }
 
-    function updateIsUnlocked(bytes32 _key, bool _isUnlocked) external {
+    function updateIsUnlocked(bytes32 _key, bool _isUnlocked) onlyAccessor() external {
         keyToExemplars[_key].isUnlocked = _isUnlocked;
     }
 

@@ -7,15 +7,19 @@ contract UserDatabase is Accessible {
     mapping(address => string) private addressToName;
     mapping(string => address) private nameToAddress;
 
-    function addUser(address _userAddress, string calldata _username) external {
+    // Setters
+
+    function addUser(address _userAddress, string calldata _username) onlyAccessor() external {
         nameToAddress[_username] = _userAddress;
         addressToName[_userAddress] = _username;
     }
 
-    function removeUser(address _userAddress) external {
+    function removeUser(address _userAddress) onlyAccessor() external {
         delete nameToAddress[addressToName[_userAddress]];
         delete addressToName[_userAddress];
     }
+
+    // Getters
 
     function getUserName(address _address) external view returns (string memory) {
         return addressToName[_address];
