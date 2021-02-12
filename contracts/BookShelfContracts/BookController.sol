@@ -4,13 +4,16 @@ pragma solidity 0.8.0;
 
 import "../BaseContracts/Mortal.sol";
 import "./Interfaces/BookDatabaseInterface.sol";
+import "../UserContracts/Interfaces/UserControllerInterface.sol";
 
 
 contract BookController is Mortal {
     BookDatabaseInterface private bookDb;
+    UserControllerInterface private userController;
 
-    constructor(address _bookDb) {
+    constructor(address _bookDb, address _userController) {
         bookDb = BookDatabaseInterface(_bookDb);
+        userController = UserControllerInterface(_userController);
     }
 
     // Delegate calls
@@ -70,5 +73,12 @@ contract BookController is Mortal {
         require(exemplar.currentHolder == msg.sender && exemplar.requester == address(0x00));
 
         bookDb.updateIsUnlocked(_key, true);
+    }
+
+    // Modifier
+
+    modifier onlyByRegisteredUser() {
+        require(userController.isRegisteredUser(msg.sender), "Not a registered User");
+        _;
     }
 }

@@ -41,6 +41,10 @@ contract UserController is Mortal {
       return userDb.getUserName(msg.sender);
     }
 
+    function isRegisteredUser(address entityAddress) external view returns (bool) {
+        return bytes(userDb.getUserName(entityAddress)).length != 0;
+    }
+
     function isRegisteredUser() external view returns (bool) {
         return bytes(userDb.getUserName(msg.sender)).length != 0;
     }
