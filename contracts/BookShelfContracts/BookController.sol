@@ -23,7 +23,7 @@ contract BookController is Mortal {
         return exemplar.owner != address(0x00);
     }
 
-    function addBook(string calldata _isbn) external {
+    function addBook(string calldata _isbn) external onlyByRegisteredUser() {
         bytes32 newKey = keccak256(abi.encode(_isbn, msg.sender, block.timestamp));
         require(!keyExists(newKey), "Hash already exists");
 
@@ -39,13 +39,13 @@ contract BookController is Mortal {
         bookDb.addExemplar(newKey, exemplar);
     }
 
-    function getExemplar(bytes32 _key) external view returns(BookDatabaseInterface.Exemplar memory) {
+    function getExemplar(bytes32 _key) external view onlyByRegisteredUser() returns(BookDatabaseInterface.Exemplar memory) {
         return bookDb.getExemplar(_key);
     }
 
     // Update delegate calls to Database Contract
 
-    function request(bytes32 _key) payable external {
+    function request(bytes32 _key) payable external onlyByRegisteredUser() {
         BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
         require(msg.value == exemplar.price, "price is not equal");
         require(exemplar.isUnlocked);
@@ -54,21 +54,21 @@ contract BookController is Mortal {
         bookDb.updateRequester{gas: 100000, value: exemplar.price}(_key, msg.sender);
     }
 
-    function approveRequest(bytes32 _key) external {
+    function approveRequest(bytes32 _key) external onlyByRegisteredUser() {
         BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
         require(exemplar.currentHolder == msg.sender);
 
         bookDb.updateCurrentHolder(_key, exemplar.requester);
     }
 
-    function lockExemplar(bytes32 _key) external {
+    function lockExemplar(bytes32 _key) external onlyByRegisteredUser() {
         BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
         require(exemplar.currentHolder == msg.sender);
 
         bookDb.updateIsUnlocked(_key, false);
     }
 
-    function unlockExemplar(bytes32 _key) external {
+    function unlockExemplar(bytes32 _key) external onlyByRegisteredUser() {
         BookDatabaseInterface.Exemplar memory exemplar = bookDb.getExemplar(_key);
         require(exemplar.currentHolder == msg.sender && exemplar.requester == address(0x00));
 
